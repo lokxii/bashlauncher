@@ -22,5 +22,7 @@ A mac app launcher written with bash
 You may want to copy the script to a bin folder in your path (e.g.
 `/usr/local/bin/`) and remove the `.sh` extension.
 
+I personally use it with `skhd` to replace spotlight search.
+
 ## LICENSE
 MIT
