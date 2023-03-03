@@ -25,6 +25,8 @@ FIFO=/tmp/bashlauncher_query_buffer.txt
 DB=/tmp/bashlauncher_dir_db.txt
 
 EDITOR="alacritty msg create-window -e nvim"
+# Don't use fish. It's very slow
+SHELL="/usr/local/bin/bash"
 
 init() {
     # setup query buffer
@@ -83,7 +85,7 @@ action(){
         return
     fi
     # just try to open it anyways
-    open "$1"
+    open "$1" || { echo "Press <enter> to exit"; head -n 1; }
 }
 
 fixurl(){
@@ -136,6 +138,7 @@ generate_files() {
             realpath -m "$dir" > $FIFO
         fi
     done
+    exit
 }
 
 main(){
@@ -172,8 +175,6 @@ main(){
 
     # cleanup
     rm $FIFO $DB
-    trap "exit" INT TERM
-    trap "kill 0" EXIT
 }
 
 cd "$HOME"
