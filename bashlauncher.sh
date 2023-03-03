@@ -48,11 +48,12 @@ unique() {
             continue
         fi
 
-        q_norm=$(realpath "$q")
-        if [[ ! -z $(grep "$q_norm" $DB) ]]; then
+        if [[ ! -z $(grep "$q" $DB) ]]; then
             continue # wait for next unique query
+        elif [[ ! -e "$q" ]]; then
+            continue
         else
-            echo "$q_norm" >> $DB
+            echo "$q" >> $DB
             echo "$q" | sed -E 's/( )/\\\1/g'
         fi
     done
@@ -132,7 +133,7 @@ generate_files() {
     # removed non existing files from list
     for dir in $@; do
         if [[ -e "$dir" ]]; then
-            realpath "$dir" > $FIFO
+            realpath -m "$dir" > $FIFO
         fi
     done
 }
@@ -147,7 +148,7 @@ main(){
     result=$(
         {
             fzf --print-query "${fzf_config[@]}" \
-                --bind "change:execute-silent(echo {q} > $FIFO)" \
+                --bind "change:execute-silent(realpath {q} > $FIFO)" \
                 --bind 'enter:accept+abort'
             kill "$!"
         } < <(finder)
@@ -168,6 +169,12 @@ main(){
         *)
             ;;
     esac
+
+    # cleanup
+    rm $FIFO $DB
+    trap "exit" INT TERM
+    trap "kill 0" EXIT
 }
 
+cd "$HOME"
 main ${dirs[@]}
