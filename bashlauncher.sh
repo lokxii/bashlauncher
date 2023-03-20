@@ -152,7 +152,7 @@ main(){
         {
             fzf --print-query "${fzf_config[@]}" \
                 --bind "change:execute-silent(realpath {q} > $FIFO)" \
-                --bind 'enter:accept+abort'
+                --bind 'enter:accept+print-query+abort'
             kill "$!"
         } < <(finder)
     )
