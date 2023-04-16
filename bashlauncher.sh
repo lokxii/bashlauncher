@@ -42,9 +42,19 @@ init() {
     touch $DB
 }
 
+trim() {
+    local var="$*"
+    # remove leading whitespace characters
+    var="${var#"${var%%[![:space:]]*}"}"
+    # remove trailing whitespace characters
+    var="${var%"${var##*[![:space:]]}"}"
+    printf '%s' "$var"
+}
+
 unique() {
     while true; do
         read q
+        q="$(trim "$q")"
         # filter out empty queries
         if [[ -z "$q" ]]; then
             continue
@@ -152,7 +162,7 @@ main(){
         {
             fzf --print-query "${fzf_config[@]}" \
                 --bind "change:execute-silent(realpath {q} > $FIFO)" \
-                --bind 'enter:accept+print-query+abort'
+                --bind 'enter:accept+print-query'
             kill "$!"
         } < <(finder)
     )
